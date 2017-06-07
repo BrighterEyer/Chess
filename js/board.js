@@ -15,12 +15,10 @@ var offsetX = (document.body.clientWidth - boardWidth) / 2;
 var offsetY = 50;
 
 var drawBoard = function() {
-	board.save();
 	board.width = boardWidth;
 	board.height = boardHeight;
 	board.fillStyle = "rgb(128,64,0)";
 	board.fillRect(offsetX, offsetY, boardWidth, boardHeight);
-	board.restore();
 	this.drawLine(board);
 	this.drawBoardText(board);
 	document.body.appendChild(canvas);
@@ -49,6 +47,8 @@ var drawLine = function(board) {
 
 	board.moveTo(offsetX + (cols / 2 + 1) * borderWide, offsetY + boardHeight - 2 * borderWide);
 	board.lineTo(offsetX + (cols / 2 - 1) * borderWide, offsetY + boardHeight);
+	board.save();
+	board.stroke();
 }
 
 function drawBoardText(board) {
