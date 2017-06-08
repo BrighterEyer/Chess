@@ -1,5 +1,5 @@
 function logger(mode,objMsg){
 	if(mode=="debug"){
-		console.log(objMsg);
+		console.log((typeof objMsg)+" : "+objMsg);
 	}
 }
