@@ -1,6 +1,6 @@
-var rows = 5 * 2 + 1;
+var rows = 5 * 2 - 1;
 var cols = 8;
-var borderWide = 50;
+var borderWide = 70;
 
 var boardWidth = cols * borderWide;
 var boardHeight = rows * borderWide;
@@ -26,25 +26,26 @@ var drawBoard = function() {
 
 var drawLine = function(board) {
 	board.strokeStyle = "#000000";
+	//画横线
 	for(var i = 0; i < rows + 1; i++) {
 		board.moveTo(offsetX, offsetY + i * borderWide);
 		board.lineTo(offsetX + boardWidth, offsetY + i * borderWide);
 	}
+	//画竖线
 	for(var i = 0; i < cols + 1; i++) {
 		board.moveTo(offsetX + i * borderWide, offsetY);
-		board.lineTo(offsetX + i * borderWide, (offsetY + boardHeight) / 2);
-		board.moveTo(offsetX + i * borderWide, (offsetY + boardHeight) / 2 + borderWide);
+		board.lineTo(offsetX + i * borderWide, (offsetY + boardHeight - borderWide / 4) / 2);
+		board.moveTo(offsetX + i * borderWide, (offsetY + boardHeight - borderWide / 4) / 2 + borderWide);
 		board.lineTo(offsetX + i * borderWide, offsetY + boardHeight);
 	}
+	//画交叉线
 	board.moveTo(offsetX + (cols / 2 - 1) * borderWide, offsetY);
 	board.lineTo(offsetX + (cols / 2 + 1) * borderWide, offsetY + 2 * borderWide);
-
 	board.moveTo(offsetX + (cols / 2 + 1) * borderWide, offsetY);
 	board.lineTo(offsetX + (cols / 2 - 1) * borderWide, offsetY + 2 * borderWide);
-
+	//画交叉线
 	board.moveTo(offsetX + (cols / 2 - 1) * borderWide, offsetY + boardHeight - 2 * borderWide);
 	board.lineTo(offsetX + (cols / 2 + 1) * borderWide, offsetY + boardHeight);
-
 	board.moveTo(offsetX + (cols / 2 + 1) * borderWide, offsetY + boardHeight - 2 * borderWide);
 	board.lineTo(offsetX + (cols / 2 - 1) * borderWide, offsetY + boardHeight);
 	board.save();
