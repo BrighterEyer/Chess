@@ -126,7 +126,7 @@ initChesses(board);
 var holdedChess;
 
 function holdChessListener(e) {
-	if(e.target.tagName = "DIV") {
+	if(e.target.tagName == "DIV") {
 		holdedChess = e.target;
 	} else if(e.target.tagName == "H2") {
 		holdedChess = e.target.parentNode;
