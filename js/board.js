@@ -12,6 +12,7 @@ canvas.width = screen.availWidth * 0.8;
 canvas.height = canvas.width * rows / cols;
 
 var offsetX = (document.body.clientWidth - boardWidth) / 2;
+//var offsetX = (document.body.scrollWidth - boardWidth) / 2;
 var offsetY = 50;
 
 var drawBoard = function() {
