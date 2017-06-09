@@ -30,6 +30,13 @@ var labelDiv;
 var label2Div;
 var label3Div;
 
+//flags 
+var flagArr1Size = 0;
+var flagArr2Size = 0;
+var flagNewArr1Size = 0;
+var flagNewArr2Size = 0;
+var flagPushTimes = 0;
+
 var xyMap = []; //或者 new Array()
 var FLAG_NONE = 0;
 var FLAG_GREEN = 1;
@@ -178,6 +185,7 @@ function newNodeStyle(color, left, top) {
 }
 
 function BuildNodeWithListener(newChess, roleType, roleId, roleOrder) {
+	++flagPushTimes;
 	newChess.hold = false;
 	newChess.roleType = roleType;
 	newChess.roleId = roleId;
@@ -185,9 +193,11 @@ function BuildNodeWithListener(newChess, roleType, roleId, roleOrder) {
 	newChess.addEventListener('click', holdChessListener);
 	bodyNode.appendChild(newChess);
 	newChess.innerHTML = "<h2>" + roles[roleId] + "</h2>";
-	if(roleType = "green") {
+	if(roleType == "green") {
+		flagArr1Size += 1;
 		chessArr1.push(roleType + "_" + roleId + "_" + roleOrder, newChess);
 	} else {
+		flagArr2Size += 1;
 		chessArr2.push(roleType + "_" + roleId + "_" + roleOrder, newChess);
 	}
 }
@@ -208,7 +218,7 @@ function holdChessListener(e) {
 		holdOne = false;
 		holdedChess.hold = false;
 		//当规则通过的时候设置px位置
-		if(CanBeNextStep() && ApplyRule()) {
+		if(CanBeNextPos() && ApplyRule()) {
 			xyMap[originXpos - 1][originYpos - 1] = FLAG_NONE;
 			xyMap[dropXpos - 1][dropYpos - 1] = (holdedChess.roleType == "red") ? FLAG_RED : FLAG_GREEN;
 			/*当棋子正确落下时设置棋子为当前x、y坐标*/
@@ -216,7 +226,7 @@ function holdChessListener(e) {
 			holdedChess.style.top = getCurChessPosYpx();
 			holdedChess.xPos = dropXpos;
 			holdedChess.yPos = dropYpos;
-			
+
 			myRound = !myRound;
 			holdedChess.style.zIndex = chessZIndex * 2;
 		} else {
@@ -367,7 +377,7 @@ function setText2Div(_text) {
 	label2Div.innerHTML = "<h4>" + _text + "</h4>";
 }
 
-function CanBeNextStep() {
+function CanBeNextPos() {
 	if(holdedChess.roleType == "green") {
 		//xyMap[holdedChess.xPos - 1][holdedChess.yPos - 1] 
 		//xyMap[originXpos - 1][originYpos - 1] 
@@ -379,7 +389,9 @@ function CanBeNextStep() {
 			if(xyMap[dropXpos - 1][dropYpos - 1] == FLAG_RED) {
 				xyMap[dropXpos - 1][dropYpos - 1] = FLAG_GREEN;
 				//				alert("kill red chess!");
-				setText2Div("kill red chess!" + "<br> can be next step!");
+				//绿方 赢得一子
+				//				setText2Div("kill red chess!" + "<br> can be next step!");
+				KillChessByPos((holdedChess.roleType == "red" ? "green" : "red"), dropXpos - 1, dropYpos - 1);
 			}
 		}
 		return true;
@@ -392,10 +404,37 @@ function CanBeNextStep() {
 			if(xyMap[dropXpos - 1][dropYpos - 1] == FLAG_GREEN) {
 				xyMap[dropXpos - 1][dropYpos - 1] = FLAG_RED;
 				//				alert("kill green chess!");
-				setText2Div("kill green chess!" + "<br> can be next step!");
+				//红方赢得一子
+				//				setText2Div("kill green chess!" + "<br> can be next step!");
+				KillChessByPos((holdedChess.roleType == "red" ? "green" : "red"), dropXpos - 1, dropYpos - 1);
 			}
 		}
 		return true;
+	}
+}
+
+function KillChessByPos(enemyRole, _xPos, _yPos) {
+	label2Div.innerHTML="";
+	var item;
+	flagNewArr1Size = chessArr1.length;
+	flagNewArr2Size = chessArr2.length;
+	if(enemyRole == "red") {
+		for(item in chessArr2) {
+			label2Div.innerHTML+=""+chessArr2[item]+"<br>";
+			if(item % 2 == 1 && chessArr2[item].xPos === _xPos && chessArr2[item].yPos === _yPos) {
+				alert(chessArr2[item]);
+				setText2Div(chessArr2[item]);
+			}
+		}
+		//		logger("alert", item);
+	} else {
+		for(item in chessArr1) {
+			label2Div.innerHTML+=chessArr2[item].roleType+"<br>";
+			if(item % 2 == 1 && chessArr1[item].xPos === _xPos && chessArr1[item].yPos === _yPos) {
+				setText2Div(chessArr1[item]);
+			}
+		}
+		//		logger("alert", item);
 	}
 }
 
