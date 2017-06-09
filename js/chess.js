@@ -8,8 +8,8 @@ var rolesId = new Array(0, 1, 2, 3, 4, 5, 6);
 var bodyNode = document.body;
 var chessDiv = document.createElement("div");
 
-var chessArr1 = new Array();
-var chessArr2 = new Array();
+var chessArr1 = new Map();
+var chessArr2 = new Map();
 
 var chessOffsetX = offsetX - borderWide / 2;
 var chessOffsetY = offsetY - borderWide / 2;
@@ -195,10 +195,10 @@ function BuildNodeWithListener(newChess, roleType, roleId, roleOrder) {
 	newChess.innerHTML = "<h2>" + roles[roleId] + "</h2>";
 	if(roleType == "green") {
 		flagArr1Size += 1;
-		chessArr1.push(roleType + "_" + roleId + "_" + roleOrder, newChess);
+		chessArr1.put(roleType + "_" + roleId + "_" + roleOrder, newChess);
 	} else {
 		flagArr2Size += 1;
-		chessArr2.push(roleType + "_" + roleId + "_" + roleOrder, newChess);
+		chessArr2.put(roleType + "_" + roleId + "_" + roleOrder, newChess);
 	}
 }
 
@@ -226,9 +226,7 @@ function holdChessListener(e) {
 			holdedChess.style.top = getCurChessPosYpx();
 			holdedChess.xPos = dropXpos;
 			holdedChess.yPos = dropYpos;
-
 			myRound = !myRound;
-			holdedChess.style.zIndex = chessZIndex * 2;
 		} else {
 			//不通过时回滚
 			holdedChess.style.left = originXposPx;
@@ -237,6 +235,7 @@ function holdChessListener(e) {
 			//			originXpos = holdedChess.xPos;
 			//			originYpos = holdedChess.yPos;
 		}
+		holdedChess.style.zIndex = chessZIndex; //不管放置位置是否正确，回滚时重置
 		logger(devMode, holdedChess.innerText + "被放下");
 		traverseXYmap();
 		//		logger("debug", xyMap);
@@ -252,6 +251,7 @@ function holdChessListener(e) {
 		if(holdedChess.roleType != (myRound ? "red" : "green")) {
 			return;
 		}
+		holdedChess.style.zIndex = chessZIndex * 2; //被举起的棋子zIndex增加，放下时重置,html页面style->div->z-index不起作用
 		originXpos = holdedChess.xPos;
 		originYpos = holdedChess.yPos;
 		holdOne = true;
@@ -391,7 +391,7 @@ function CanBeNextPos() {
 				//				alert("kill red chess!");
 				//绿方 赢得一子
 				//				setText2Div("kill red chess!" + "<br> can be next step!");
-				KillChessByPos((holdedChess.roleType == "red" ? "green" : "red"), dropXpos - 1, dropYpos - 1);
+				KillChessByPos((holdedChess.roleType == "red" ? "green" : "red"), dropXpos, dropYpos);
 			}
 		}
 		return true;
@@ -403,10 +403,9 @@ function CanBeNextPos() {
 		if(dropXpos <= cols + 1 && dropYpos <= rows + 1) {
 			if(xyMap[dropXpos - 1][dropYpos - 1] == FLAG_GREEN) {
 				xyMap[dropXpos - 1][dropYpos - 1] = FLAG_RED;
-				//				alert("kill green chess!");
 				//红方赢得一子
 				//				setText2Div("kill green chess!" + "<br> can be next step!");
-				KillChessByPos((holdedChess.roleType == "red" ? "green" : "red"), dropXpos - 1, dropYpos - 1);
+				KillChessByPos((holdedChess.roleType == "red" ? "green" : "red"), dropXpos, dropYpos);
 			}
 		}
 		return true;
@@ -414,28 +413,43 @@ function CanBeNextPos() {
 }
 
 function KillChessByPos(enemyRole, _xPos, _yPos) {
-	label2Div.innerHTML="";
+	label2Div.innerHTML = "";
+	var s = "";
 	var item;
-	flagNewArr1Size = chessArr1.length;
-	flagNewArr2Size = chessArr2.length;
 	if(enemyRole == "red") {
-		for(item in chessArr2) {
-			label2Div.innerHTML+=""+chessArr2[item]+"<br>";
-			if(item % 2 == 1 && chessArr2[item].xPos === _xPos && chessArr2[item].yPos === _yPos) {
-				alert(chessArr2[item]);
-				setText2Div(chessArr2[item]);
+		var thisnode, thiskey;
+		chessArr2.each(function(key, obj_div, index) {
+			//			"(x:" + _xPos + "," + "y:" + _yPos + ")<br>";
+			if(obj_div.xPos == _xPos && obj_div.yPos == _yPos) {
+				label2Div.innerHTML += "(x:" + _xPos + "," + "y:" + _yPos + ")<br>";
+				thisnode = chessArr2.get(key);
+				thiskey = key;
 			}
-		}
-		//		logger("alert", item);
+		});
+		chessArr2.remove(thiskey);
+		thisnode.parentNode.removeChild(thisnode);
+		flagNewArr1Size = "绿方剩余棋子 : " + chessArr1.size();
+		flagNewArr2Size = "红方剩余棋子 : " + chessArr2.size();
+		label2Div.innerHTML += "" + flagNewArr1Size + "<br>" + flagNewArr2Size + "<br>";
+		label2Div.innerHTML += s;
 	} else {
-		for(item in chessArr1) {
-			label2Div.innerHTML+=chessArr2[item].roleType+"<br>";
-			if(item % 2 == 1 && chessArr1[item].xPos === _xPos && chessArr1[item].yPos === _yPos) {
-				setText2Div(chessArr1[item]);
+		var thisnode, thiskey;
+		chessArr1.each(function(key, obj_div, index) {
+			//			"(x:" + _xPos + "," + "y:" + _yPos + ")<br>";
+			if(obj_div.xPos == _xPos && obj_div.yPos == _yPos) {
+				label2Div.innerHTML += "(x:" + _xPos + "," + "y:" + _yPos + ")<br>";
+				thisnode = chessArr1.get(key);
+				thiskey = key;
 			}
-		}
-		//		logger("alert", item);
+		});
+		chessArr1.remove(thiskey);
+		thisnode.parentNode.removeChild(thisnode);
+		flagNewArr1Size = "绿方剩余棋子 : " + chessArr1.size();
+		flagNewArr2Size = "红方剩余棋子 : " + chessArr2.size();
+		label2Div.innerHTML += "" + flagNewArr1Size + "<br>" + flagNewArr2Size + "<br>";
+		label2Div.innerHTML += s;
 	}
+
 }
 
 /*举棋时，holdedChess不为空，可以执行,下面的下棋逻辑判断*/
