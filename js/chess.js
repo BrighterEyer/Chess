@@ -739,44 +739,63 @@ function ScanChessInXLine(_originXpos, _dropXpos, _originYpos, _dropYpos) {
 //炮不能吃临近的棋
 function ScanNext2ChessExisting() {
 	var chessNumInALine = 0;
+	var i;
 	if(dropXpos == originXpos) { //上下移动的情况
 		if(originYpos > dropYpos) { //向上移动时
-			for(var i = dropYpos - 1; i < originYpos - 1; i++) {
+			for(i = originYpos - 2; i >= dropYpos - 1; i--) {
 				if(xyMap[originXpos - 1][i] != FLAG_NONE) {
-					++chessNumInALine;
+					if(++chessNumInALine == 2) {
+						break;
+					}
 				}
 			}
+			//			logger("alert","up:"+chessNumInALine);
 		} else if(originYpos < dropYpos) { //向下移动时
-			for(var i = originYpos; i < dropYpos; i++) {
+			for(i = originYpos; i < dropYpos; i++) {
 				if(xyMap[originXpos - 1][i] != FLAG_NONE) {
-					++chessNumInALine;
+					if(++chessNumInALine == 2) {
+						break;
+					}
 				}
 			}
+			//			logger("alert","down:"+chessNumInALine);
+		}
+		if(i + 1 == dropYpos) {
+			return true;
 		}
 	} else if(dropYpos == originYpos) { //左右移动的情况
 		if(originXpos > dropXpos) { //向左移动时
-			for(var i = dropXpos - 1; i < originXpos - 1; i++) {
+			for(i = originXpos - 2; i >= dropXpos - 1; i--) {
 				if(xyMap[i][originYpos - 1] != FLAG_NONE) {
-					++chessNumInALine;
+					if(++chessNumInALine == 2) {
+						break;
+					}
 				}
 			}
+			//			logger("alert", "left:" + chessNumInALine);
 		} else if(originXpos < dropXpos) { //向右移动时
-			for(var i = originXpos; i < dropXpos; i++) {
+			for(i = originXpos; i < dropXpos; i++) {
 				if(xyMap[i][originYpos - 1] != FLAG_NONE) {
-					++chessNumInALine;
+					if(++chessNumInALine == 2) {
+						break;
+					}
 				}
 			}
+			//			logger("alert","right:"+chessNumInALine);
+		}
+		if(i + 1 == dropXpos) {
+			return true;
 		}
 	}
 	//		logger(devMode,"中间的棋子数量:"+chessNumInALine);
-	if(chessNumInALine == 0 || chessNumInALine == 2) {
+	if(chessNumInALine == 0)
 		return true;
-	} else
+	else
 		return false;
 }
 
 function GameOverListener() {
-	if(isHolderWin) {//这个判断优先
+	if(isHolderWin) { //这个判断优先
 		PopupInfo("游戏结束!<br>" + holdedChess.roleType + "方获胜");
 		return;
 	} else if(ScanChessInYLine(king1Xpos, king2Xpos, king1Ypos, king2Ypos) || isOpposite) {
