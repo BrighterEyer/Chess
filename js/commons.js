@@ -1,8 +1,21 @@
 function logger(mode, objMsg) {
 	if(mode == "debug") {
-		console.log((typeof objMsg) + " : " + objMsg);
+		//		console.log((typeof objMsg) + " : " + objMsg);
+		console.log(objMsg);
 	} else if(mode == "alert") {
 		alert(objMsg);
+	}
+}
+
+function AppendText(objDiv, text) {
+	objDiv.innerHTML += text;
+}
+
+function AppendTextClear(objDiv, text) {
+	if(objDiv.innerHTML == "") {
+		objDiv.innerHTML += text;
+	} else {
+		objDiv.innerHTML = text;
 	}
 }
 
