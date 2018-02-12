@@ -1,3 +1,3 @@
 # Chess
 <br>
-<a href="https://github.com/BrighterEyer/Chess" target="_blank">开始玩!</a>
+<a href="https://BrighterEyer.github.io/Chess" target="_blank">开始玩!</a>
